@@ -258,13 +258,13 @@ class WhisperModel:
             # Create the sentence object
             structured_sentences.append(
                 Sentence(
-                    start_time=sentence_with_word_metas[0]["start"],
-                    end_time=sentence_with_word_metas[-1]["end"],
+                    start_time=float(sentence_with_word_metas[0]["start"]),
+                    end_time=float(sentence_with_word_metas[-1]["end"]),
                     text=sentence_text,
                     words=[
                         Word(
-                            start_time=word_with_meta["start"],
-                            end_time=word_with_meta["end"],
+                            start_time=float(word_with_meta["start"]),
+                            end_time=float(word_with_meta["end"]),
                             text=self._clean_word(word_with_meta["text"]),
                         )
                         for word_with_meta in sentence_with_word_metas
