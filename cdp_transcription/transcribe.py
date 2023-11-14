@@ -9,16 +9,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import spacy
-from pydantic import BaseModel
 from faster_whisper import WhisperModel as FasterWhisper
+from pydantic import BaseModel
 from pydub import AudioSegment
 from spacy.cli.download import download as download_spacy_model
 from spacy.tokenizer import Tokenizer
 from spacy.util import compile_infix_regex
 from tqdm import tqdm
-from transcript_file_format import Transcript, Sentence, Word
+from transcript_file_format import Sentence, Transcript, Word
 
-from .. import __version__
+from . import __version__
 
 if TYPE_CHECKING:
     from spacy.language import Language
@@ -33,11 +33,13 @@ spacy.prefer_gpu()
 
 ###############################################################################
 
+
 class TranscriptionConfig(BaseModel):
     model: str = "small"
     language: str = "en"
     compute_type: str = "float16"
     device: str = "auto"
+
 
 class WhisperModel:
     @staticmethod
@@ -77,7 +79,7 @@ class WhisperModel:
 
         nlp.tokenizer = custom_tokenizer(nlp)
         return nlp
-    
+
     @staticmethod
     def _clean_word(word: str) -> str:
         return re.sub(r"[^\w\/\-\']+", "", word).lower()
@@ -271,7 +273,7 @@ class WhisperModel:
             generator=(
                 f"CDP Transcription "
                 f"-- version {__version__} "
-                f"-- Whisper Model Name '{self.model_name}'"
+                f"-- Whisper Model Name '{self.config.model}'"
             ),
             created_datetime=datetime.utcnow().isoformat(),
             sentences=structured_sentences,
