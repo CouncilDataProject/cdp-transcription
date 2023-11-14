@@ -78,7 +78,7 @@ async def transcribe(
         # Store to file
         transcript_to_json(
             transcript=transcript,
-            output_filepath=output_filepath,
+            path=output_filepath,
         )
 
         return TranscriptionSuccess(
@@ -97,10 +97,7 @@ async def transcribe(
 
 
 def main() -> None:
-    global _PRELOADED_NLP
     global _PRELOADED_MODEL
-
-    port = os.environ.get("PORT", 8080)
 
     # Setup logging
     log_level = os.environ.get("LOG_LEVEL", "INFO")
@@ -127,6 +124,7 @@ def main() -> None:
     )
 
     # Run server
+    port = os.environ.get("PORT", 8080)
     uvicorn.run(app, host="0.0.0.0", port=port)
 
 

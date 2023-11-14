@@ -37,7 +37,7 @@ spacy.prefer_gpu()
 class TranscriptionConfig(BaseModel):
     model: str = "small"
     language: str = "en"
-    compute_type: str = "float16"
+    compute_type: str = "float32"
     device: str = "auto"
 
 

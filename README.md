@@ -2,9 +2,18 @@
 
 A fastapi docker whisper server that returns transcripts using [transcript-file-format](https://github.com/CouncilDataProject/transcript-file-format).
 
+## Installation
+
+```bash
+pip install .
+conda install -c anaconda cudnn -y
+```
+
 ## Usage
 
-TODO
+```bash
+run-cdp-transcription-server
+```
 
 ## TODO
 
