@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 # https://peps.python.org/pep-0621/
 [project]
 name = "cdp-transcription"
-description = "API handling for transcribing audio files using SOTA models"
+description = "Microservice for transcribing audio into our standard file format"
 keywords = []
 readme = "README.md"
 requires-python = ">=3.10"
