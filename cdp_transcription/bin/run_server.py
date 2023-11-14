@@ -6,6 +6,7 @@ import traceback
 
 import uvicorn
 from fastapi import FastAPI
+from faster_whisper import WhisperModel as FasterWhisper
 from pydantic import BaseModel
 from transcript_file_format import to_json as transcript_to_json
 
@@ -21,7 +22,6 @@ log = logging.getLogger(__name__)
 
 app = FastAPI()
 
-_PRELOADED_NLP = None
 _PRELOADED_MODEL = None
 
 ###############################################################################
@@ -64,12 +64,13 @@ async def transcribe(
 ) -> TranscriptionSuccess | TranscriptionError:
     """Call with http://localhost:{port}/transcribe."""
     try:
-        transcription_handler = WhisperModel(
-            config=config,
-            nlp=_PRELOADED_NLP,
-            model=_PRELOADED_MODEL,
-        )
+        # Handle cached model or load new
+        if _PRELOADED_MODEL:
+            transcription_handler = _PRELOADED_MODEL
+        else:
+            transcription_handler = WhisperModel(config=config)
 
+        # Transcribe
         transcript = transcription_handler.transcribe(
             audio_uri=audio_uri,
         )
@@ -110,18 +111,20 @@ def main() -> None:
     )
 
     # Preload models
-    preload_nlp = os.environ.get("PRELOAD_NLP", True)
     preload_model = os.environ.get("PRELOAD_MODEL", True)
-    preload_model_config = os.environ.get("PRELOAD_MODEL_CONFIG", None)
-
-    if preload_nlp:
-        _PRELOADED_NLP = WhisperModel._load_spacy_model()
     if preload_model:
-        _PRELOADED_MODEL = WhisperModel(config=DEFAULT_TRANSCRIPTION_CONFIG)
-        if preload_model_config:
-            raise NotImplementedError(
-                "Preloading whisper model with custom config is not yet supported."
-            )
+        nlp = WhisperModel._try_load_spacy_model()
+        model = FasterWhisper(
+            model_size_or_path=DEFAULT_TRANSCRIPTION_CONFIG.model,
+            device=DEFAULT_TRANSCRIPTION_CONFIG.device,
+            compute_type=DEFAULT_TRANSCRIPTION_CONFIG.compute_type,
+        )
+
+    _PRELOADED_MODEL = WhisperModel(
+        config=DEFAULT_TRANSCRIPTION_CONFIG,
+        model=model,
+        nlp=nlp,
+    )
 
     # Run server
     uvicorn.run(app, host="0.0.0.0", port=port)

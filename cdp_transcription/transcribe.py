@@ -81,6 +81,14 @@ class WhisperModel:
         return nlp
 
     @staticmethod
+    def _try_load_spacy_model() -> Language | None:
+        try:
+            return WhisperModel._load_spacy_model()
+        except Exception:
+            download_spacy_model("en_core_web_trf")
+            return WhisperModel._load_spacy_model()
+
+    @staticmethod
     def _clean_word(word: str) -> str:
         return re.sub(r"[^\w\/\-\']+", "", word).lower()
 
@@ -124,11 +132,7 @@ class WhisperModel:
         if nlp is not None:
             self.nlp = nlp
         else:
-            try:
-                self.nlp = self._load_spacy_model()
-            except Exception:
-                download_spacy_model("en_core_web_trf")
-                self.nlp = self._load_spacy_model()
+            self.nlp = self._try_load_spacy_model()
 
     def transcribe(
         self,
