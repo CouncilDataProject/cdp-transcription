@@ -34,7 +34,7 @@ class StatusResponse(BaseModel):
     version: str
 
 
-@app.get("/status/")
+@app.get("/status")
 async def root() -> StatusResponse:
     """Call with http://localhost:{port}/status/."""
     return StatusResponse(
